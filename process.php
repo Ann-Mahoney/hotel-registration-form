@@ -1,25 +1,24 @@
 <?php
 require_once 'db.php';
 require_once 'functions.php';
-
-// Initialize variables
-$errors = [];
-$success = '';
-$edit = false;
-$edit_id = null;
-$fields = [
-    'name' => '',
-    'email' => '',
-    'phone' => '',
-    'address' => '',
-    'room_type' => '',
-    'check_in' => '',
-    'check_out' => '',
-    'guests' => '',
-    'special_requests' => '',
-    'payment_method' => ''
-];
-
+if (!isset($errors)) $errors = [];
+if (!isset($success)) $success = '';
+if (!isset($edit)) $edit = false;
+if (!isset($edit_id)) $edit_id = null;
+if (!isset($fields)) {
+    $fields = [
+        'name' => '',
+        'email' => '',
+        'phone' => '',
+        'address' => '',
+        'room_type' => '',
+        'check_in' => '',
+        'check_out' => '',
+        'guests' => '',
+        'special_requests' => '',
+        'payment_method' => ''
+    ];
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($fields as $k => $v) {
         $fields[$k] = sanitize($_POST[$k] ?? '');
@@ -48,6 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 (int)$_POST['edit_id']
             ]);
             $success = 'Registration updated successfully!';
+            $edit = false;
+            $edit_id = null;
+            // Reset fields after success
+            foreach ($fields as $k => $v) {
+                $fields[$k] = '';
+            }
         } else {
             // Insert
             $stmt = $pdo->prepare('INSERT INTO hotel (name, email, phone, address, room_type, check_in, check_out, guests, special_requests, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
@@ -56,12 +61,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $fields['check_in'], $fields['check_out'], $fields['guests'], $fields['special_requests'], $fields['payment_method']
             ]);
             $success = 'Registration successful!';
+            // Reset fields after success
+            foreach ($fields as $k => $v) {
+                $fields[$k] = '';
+            }
         }
-        // Reset fields after success
-        foreach ($fields as $k => $v) {
-            $fields[$k] = '';
+    } else {
+        // If editing and validation fails, keep edit mode and id
+        if (isset($_POST['edit_id']) && $_POST['edit_id']) {
+            $edit = true;
+            $edit_id = (int)$_POST['edit_id'];
         }
-        $edit = false;
-        $edit_id = null;
     }
 } 

@@ -1,19 +1,21 @@
 <?php
 require_once 'db.php';
-$fields = [
-    'name' => '',
-    'email' => '',
-    'phone' => '',
-    'address' => '',
-    'room_type' => '',
-    'check_in' => '',
-    'check_out' => '',
-    'guests' => '',
-    'special_requests' => '',
-    'payment_method' => ''
-];
-$edit = false;
-$edit_id = null;
+if (!isset($fields)) {
+    $fields = [
+        'name' => '',
+        'email' => '',
+        'phone' => '',
+        'address' => '',
+        'room_type' => '',
+        'check_in' => '',
+        'check_out' => '',
+        'guests' => '',
+        'special_requests' => '',
+        'payment_method' => ''
+    ];
+}
+if (!isset($edit)) $edit = false;
+if (!isset($edit_id)) $edit_id = null;
 if (isset($_GET['edit'])) {
     $edit = true;
     $edit_id = (int)$_GET['edit'];
